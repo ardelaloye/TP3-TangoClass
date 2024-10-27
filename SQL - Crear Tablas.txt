@@ -1,0 +1,108 @@
+USE sql10739862;
+
+-- Tabla Alumno
+CREATE TABLE Alumno (
+    IDAlumno INT AUTO_INCREMENT PRIMARY KEY,
+    AluApellido VARCHAR(50) NOT NULL,
+    AluNombre VARCHAR(50) NOT NULL,
+    AluDNI VARCHAR(20) NOT NULL,
+    AluFechaNacimiento DATE NOT NULL,
+    AluDomicilio VARCHAR(100),
+    AluTelefono VARCHAR(20),
+    AluEmail VARCHAR(50),
+    AluEstado VARCHAR(20) NOT NULL
+);
+
+-- Tabla Docente
+CREATE TABLE Docente (
+    IDDocente INT AUTO_INCREMENT PRIMARY KEY,
+    DocApellido VARCHAR(50) NOT NULL,
+    DocNombre VARCHAR(50) NOT NULL,
+    DocDNI VARCHAR(20) NOT NULL,
+    DocTelefono VARCHAR(20),
+    DocEmail VARCHAR(50),
+    DocEstado VARCHAR(20) NOT NULL
+);
+
+-- Tabla Taller
+CREATE TABLE Taller (
+    IDTaller INT AUTO_INCREMENT PRIMARY KEY,
+    TalNombre VARCHAR(100) NOT NULL,
+    TalFechaInicio DATE NOT NULL,
+    TalFechaCierre DATE,
+    TalCupoMaximo INT NOT NULL,
+    IDDocente INT NOT NULL,
+    TalComisionDocente DECIMAL(10, 2) NOT NULL,
+    TalEstado VARCHAR(20) NOT NULL,
+    FOREIGN KEY (IDDocente) REFERENCES Docente(IDDocente)
+);
+
+-- Tabla Inscripcion
+CREATE TABLE Inscripcion (
+    IDInscripcion INT AUTO_INCREMENT PRIMARY KEY,
+    IDAlumno INT NOT NULL,
+    IDTaller INT NOT NULL,
+    InsFechaInscripcion DATE NOT NULL,
+    InsFechaBaja DATE,
+    InsEstado VARCHAR(20) NOT NULL,
+    FOREIGN KEY (IDAlumno) REFERENCES Alumno(IDAlumno),
+    FOREIGN KEY (IDTaller) REFERENCES Taller(IDTaller)
+);
+
+-- Tabla Cuota
+CREATE TABLE Cuota (
+    IDInscripcion INT NOT NULL,
+    CuoPeriodo VARCHAR(20) NOT NULL,
+    CuoFechaEmision DATE NOT NULL,
+    CuoImporte DECIMAL(10, 2) NOT NULL,
+    CuoFechaVencimiento DATE NOT NULL,
+    CuoFechaPago DATE,
+    CuoEstado VARCHAR(20) NOT NULL,
+    PRIMARY KEY (IDInscripcion, CuoPeriodo),
+    FOREIGN KEY (IDInscripcion) REFERENCES Inscripcion(IDInscripcion)
+);
+
+-- Tabla Clase
+CREATE TABLE Clase (
+    IDClase INT AUTO_INCREMENT PRIMARY KEY,
+    IDTaller INT NOT NULL,
+    ClaFechaClase DATE NOT NULL,
+    ClaTema VARCHAR(100),
+    ClaObservaciones TEXT,
+    ClaEstado VARCHAR(20) NOT NULL,
+    FOREIGN KEY (IDTaller) REFERENCES Taller(IDTaller)
+);
+
+-- Tabla Asistencia
+CREATE TABLE Asistencia (
+    IDAsistencia INT AUTO_INCREMENT PRIMARY KEY,
+    IDClase INT NOT NULL,
+    IDAlumno INT NOT NULL,
+    AsiPresente BOOLEAN NOT NULL,
+    AsiLlegoTarde BOOLEAN NOT NULL,
+    AsiSalioAntes BOOLEAN NOT NULL,
+    FOREIGN KEY (IDClase) REFERENCES Clase(IDClase), 
+    FOREIGN KEY (IDAlumno) REFERENCES Alumno(IDAlumno)
+);
+
+-- Tabla Liquidacion
+CREATE TABLE Liquidacion (
+    IDLiquidacion INT AUTO_INCREMENT PRIMARY KEY,
+    IDTaller INT NOT NULL,
+    LiqIngresosTaller DECIMAL(10, 2) NOT NULL,
+    LiqComisionDocente DECIMAL(10, 2) NOT NULL,
+    LiqImporteLiquidar DECIMAL(10, 2) NOT NULL,
+    LiqFechaPago DATE,
+    LiqEstado VARCHAR(20) NOT NULL,
+    FOREIGN KEY (IDTaller) REFERENCES Taller(IDTaller)
+);
+
+CREATE TABLE ValoresTaller (
+    IDValoresTaller INT AUTO_INCREMENT, 
+    IDTaller INT NOT NULL,
+    ValFechaDesde DATE NOT NULL,
+    ValFechaHasta DATE NOT NULL,
+    ValImporte DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (IDValoresTaller),
+    FOREIGN KEY (IDTaller) REFERENCES Taller(IDTaller) ON DELETE CASCADE
+);
